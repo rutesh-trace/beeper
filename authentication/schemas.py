@@ -74,7 +74,7 @@ class UserResponse(BaseModel):
     email: Optional[EmailStr] = None
     birth_date: Optional[date] = None
     profile_image: Optional[str] = None
-    profile_thumbnail_image: Optional[str] = None  # Add this field
+    profile_thumbnail_image: Optional[str] = None
 
     class Config:
         from_attributes = True

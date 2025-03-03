@@ -1,12 +1,14 @@
 from contextlib import asynccontextmanager
-
+import socketio
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 import db_domains.db as db
 from authentication.routers import router as auth_router
+from chats.websockets import socket_app
 from common.cache_string import refresh
 from config import app_config
 
@@ -26,12 +28,13 @@ app = FastAPI(
     redoc_url="/redoc",
     lifespan=lifespan
 )
+app.mount("/", socket_app)
 
-# Register media folder as static files
+# ✅ Register media folder as static files
 MEDIA_DIR = "media"
 app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
 
-# Include All Routers
+# ✅ Include All Routers
 app.include_router(auth_router)
 
 if __name__ == "__main__":

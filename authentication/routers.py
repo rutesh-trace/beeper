@@ -82,7 +82,7 @@ async def send_otp(request: LoginRequest):
 
 
 #
-# @router.post("/verify-otp")
+@router.post("/verify-otp")
 async def verify_otp(request: VerifyOTPRequest):
     """Verify OTP and authenticate user"""
     response = user_service.verify_otp(request)
@@ -91,5 +91,5 @@ async def verify_otp(request: VerifyOTPRequest):
         success=True,
         message=f"OTP verified successfully for {request.phone_number} number",
         status_code=status.HTTP_200_OK,
-        data=[{"otp": response.get("otp"), "otp_secret": response.get("secret")}] if response else []
+        data=[{"token": response.get("token")}] if response else []
     )

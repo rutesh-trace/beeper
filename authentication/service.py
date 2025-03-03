@@ -59,6 +59,7 @@ class UserServices:
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=gettext("already_exists").format("Email")
                 )
+            user_dict = user_data.model_dump()
             if profile_image:
                 allowed_types = {"image/jpeg", "image/png"}
                 if profile_image.content_type not in allowed_types:
@@ -67,12 +68,10 @@ class UserServices:
                         detail="Invalid image format. Only JPG, JPEG, PNG allowed."
                     )
 
-            user_dict = user_data.model_dump()
+                image_path, thumbnail_path = save_uploaded_image(profile_image)
 
-            image_path, thumbnail_path = save_uploaded_image(profile_image)
-
-            user_dict["profile_image"] = image_path
-            user_dict["profile_thumbnail_image"] = thumbnail_path
+                user_dict["profile_image"] = image_path
+                user_dict["profile_thumbnail_image"] = thumbnail_path
 
             return self.db_interface.create(user_dict)
 
@@ -124,25 +123,38 @@ class UserServices:
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="An error occurred while sending OTP. Please try again."
+                detail=str(e)
             )
 
     def verify_otp(self, verify_otp: VerifyOTPRequest):
         try:
-            """Verify OTP and authenticate user."""
-            success, message = OTPService.verify_otp(otp=verify_otp.otp, otp_secret=verify_otp.otp_secret)
-            jwt_response = JWTService().create_refresh_token({"phone_number": verify_otp.phone_number})
+            # Check if the phone number exists in the database
+            phone_number = verify_otp.phone_number
+            user_phone_filter = [User.phone == phone_number]
+            if user_details := self.db_interface.read_by_fields(user_phone_filter):
+                message, success = OTPService.verify_otp(otp=verify_otp.otp, otp_secret=verify_otp.otp_secret)
+                token_data = {
+                    "id": user_details.id,
+                    "name": f"{user_details.first_name} {user_details.last_name}",
+                    "phone_number": user_details.phone,
+                    "email": user_details.email
+                }
+                jwt_response = JWTService().create_tokens(token_data)
 
-            if not success:
+                if not success:
+                    raise HTTPException(
+                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        detail=message
+                    )
+
+                return {"success": True, "message": message, "token": jwt_response}
+            else:
                 raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="Error Occurred while verifying OTP."
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=gettext("does_not_exists").format(phone_number)
                 )
-
-            return {"success": True, "message": message, "token": jwt_response}
-
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Error Occurred while verifying OTP."
+                detail=str(e)
             )

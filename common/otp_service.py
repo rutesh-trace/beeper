@@ -18,8 +18,9 @@ class OTPService:
         otp = totp.now()
 
         print(f"OTP for {phone}: {otp}")
+        print(f"OTP Secret for {phone}: {secret}")
 
-        return {"otp": otp, "secret": secret}
+        return otp, secret
 
     @classmethod
     def verify_otp(cls, otp: str, otp_secret: str):

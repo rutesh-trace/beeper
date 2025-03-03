@@ -16,8 +16,11 @@
   "error_updating_data_to_db": "Error while updating the {} details from the Database",
   "error_deleting_data_to_db": "Error while deleting the {} details from the Database",
   "profile_image_directory": "media/profile_images",
+  "chat_image_directory": "media/chat_images",
   "phone_already_registered": "Phone number is already registered",
   "token_expired": "Token has expired",
   "invalid_token": "Invalid token.",
-  "invalid_otp": "Invalid OTP"
+  "invalid_otp": "Invalid OTP",
+  "conversation_not_found" : "Conversation not Found",
+  "message_not_found": "Message not Found"
 }

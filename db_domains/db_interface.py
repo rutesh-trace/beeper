@@ -31,6 +31,16 @@ class DBInterface:
         session.close()
         return result
 
+    def update(self, _id: str, data: DataObject) -> DataObject:
+        session = DBSession()
+        item: Base = session.query(self.db_class).get(_id)
+        for key, value in data.items():
+            setattr(item, key, value)
+        session.commit()
+        result = to_dict(item)
+        session.close()
+        return result
+
     def read_by_fields(self, fields: list) -> Any:
         session = DBSession()
         item = session.query(self.db_class).filter(*fields).first()
