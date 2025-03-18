@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 import socketio
 import uvicorn
@@ -28,11 +29,11 @@ app = FastAPI(
     redoc_url="/redoc",
     lifespan=lifespan
 )
-app.mount("/", socket_app)
 
-# ✅ Register media folder as static files
-MEDIA_DIR = "media"
+MEDIA_DIR = os.path.abspath("media")
+print(f"Serving media from: {MEDIA_DIR}")
 app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
+app.mount("/", socket_app)
 
 # ✅ Include All Routers
 app.include_router(auth_router)

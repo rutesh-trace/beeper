@@ -19,6 +19,10 @@ class Setting(BaseSettings):
     ENV_FASTAPI_SERVER_TYPE: str
     JWT_SECRET_KEY: str
     JWT_REFRESH_SECRET_KEY: str
+    AWS_ACCESS_KEY: str
+    AWS_SECRET_KEY: str
+    AWS_REGION: str
+    AWS_BUCKET_NAME: str
 
     # Default Log type
     LOG_LEVEL: str
@@ -68,6 +72,10 @@ class Config(object):
     LOG_LEVEL = app_settings.LOG_LEVEL
     JWT_SECRET_KEY = app_settings.JWT_SECRET_KEY
     JWT_REFRESH_SECRET_KEY = app_settings.JWT_REFRESH_SECRET_KEY
+    AWS_ACCESS_KEY = app_settings.AWS_ACCESS_KEY
+    AWS_SECRET_KEY = app_settings.AWS_SECRET_KEY
+    AWS_REGION = app_settings.AWS_REGION
+    AWS_BUCKET_NAME = app_settings.AWS_BUCKET_NAME
 
 
 class LocalConfig(Config):

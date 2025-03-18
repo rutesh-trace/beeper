@@ -46,3 +46,48 @@ class DBInterface:
         item = session.query(self.db_class).filter(*fields).first()
         session.close()
         return item
+
+    def read_all_by_fields(self, filters: list = None, order_by=None, order_direction: str = "asc", limit: int = None,
+                           offset: int = None) -> DataObject:
+        """
+        Reads all records that match the provided filters.
+
+        Args:
+            filters (list): List of filter conditions.
+            order_by: SQLAlchemy column to order by.
+            order_direction: "asc" or "desc".
+            limit (int): Number of records to fetch.
+            offset (int): Number of records to skip.
+
+        Returns:
+            list[DataObject]: A list of dictionary representations of records.
+        """
+        session = DBSession()
+        query = session.query(self.db_class)
+
+        # Apply filters if provided
+        if filters:
+            query = query.filter(*filters)
+
+        # Apply ordering if provided
+        # print(f"Ordering by {order_by}")
+        # if order_by:
+        #     from sqlalchemy import asc, desc
+        #
+        #     column = getattr(self.db_class, order_by, None)
+        #     if column is not None:
+        #         query = query.order_by(asc(column) if order_direction == "asc" else desc(column))
+        #     else:
+        #         raise ValueError(f"Invalid column '{order_by}' for ordering")
+        # breakpoint()
+
+        # Apply pagination
+        if limit:
+            query = query.limit(limit)
+        if offset:
+            query = query.offset(offset)
+
+        items = query.all()
+        session.close()
+
+        return items  # Convert objects to dictionary format

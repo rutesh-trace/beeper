@@ -8,7 +8,7 @@ from chats.models import MessageStatus
 
 # Schema for sending a new chat message
 class ChatMessageCreate(BaseModel):
-    conversation_id: int
+    conversation_id: Optional[int] = None
     sender_id: int
     receiver_id: int
     message: str
